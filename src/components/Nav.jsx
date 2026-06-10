@@ -11,38 +11,36 @@ const links = [
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    let last = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled(y > 24);
+      setHidden(y > 140 && y > last); // hide on scroll down, show on up
+      last = y;
+    };
     onScroll();
-    window.addEventListener("scroll", onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Navigate to a section: if not on home, go home first then scroll.
   const go = (to) => (e) => {
     e.preventDefault();
     const hash = to.includes("#") ? "#" + to.split("#")[1] : "";
-    if (location.pathname !== "/") {
-      navigate("/" + hash);
-      return;
-    }
-    if (!hash) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
-      document.querySelector(hash)?.scrollIntoView({ behavior: "smooth" });
-    }
+    if (location.pathname !== "/") return navigate("/" + hash);
+    if (!hash) window.scrollTo({ top: 0, behavior: "smooth" });
+    else document.querySelector(hash)?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
     <header
-      className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? "backdrop-blur-md bg-bg/70 border-b border-line"
-          : "bg-transparent border-b border-transparent"
-      }`}
+      className={`fixed top-0 inset-x-0 z-50 transition-all duration-500
+        ${hidden ? "-translate-y-full" : "translate-y-0"}
+        ${scrolled ? "backdrop-blur-md bg-bg/70 border-b border-line" : "bg-transparent border-b border-transparent"}`}
     >
       <nav className="max-w-page mx-auto px-6 h-16 flex items-center justify-between">
         <Link
@@ -53,19 +51,26 @@ export default function Nav() {
           {profile.name.split(" ")[0]}
           <span className="text-accent">.</span>
         </Link>
-        <ul className="flex items-center gap-7">
-          {links.map((l) => (
-            <li key={l.label}>
-              <a
-                href={l.to}
-                onClick={go(l.to)}
-                className="font-mono text-sm tracking-[0.03em] text-muted hover:text-ink transition-colors duration-300"
-              >
-                {l.label}
-              </a>
-            </li>
-          ))}
-        </ul>
+
+        <div className="flex items-center gap-8">
+          <span className="hidden md:inline-flex items-center gap-2 text-[0.72rem] font-mono text-muted">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            Available for work
+          </span>
+          <ul className="flex items-center gap-6">
+            {links.map((l) => (
+              <li key={l.label}>
+                <a
+                  href={l.to}
+                  onClick={go(l.to)}
+                  className="font-mono text-sm text-muted hover:text-ink transition-colors duration-300"
+                >
+                  {l.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
       </nav>
     </header>
   );

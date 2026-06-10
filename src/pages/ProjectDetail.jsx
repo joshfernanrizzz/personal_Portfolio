@@ -1,45 +1,56 @@
 import { useParams, Navigate } from "react-router-dom";
 import { projects } from "../content.js";
-import { Reveal, SmartImage, ArrowLink } from "../components/ui.jsx";
-
-// ---- shared bits -----------------------------------------------------------
+import { Reveal, SmartImage, ArrowLink, fixSrc } from "../components/ui.jsx";
 
 function Header({ p }) {
   return (
     <Reveal>
-      <div className="mb-10">
+      <div className="mb-12">
         <ArrowLink label="All work" direction="left" to="/#work" />
-        <div className="flex items-center gap-3 mt-8 mb-4">
-          <span className="h-px w-8" style={{ background: p.accent }} />
+        <div className="flex items-center gap-4 mt-12 mb-5">
+          <span className="h-px w-12" style={{ background: p.accent }} />
           <span className="eyebrow">{p.cardSubtitle}</span>
         </div>
         <h1
-          className="font-serif text-[clamp(3rem,9vw,6rem)] leading-[0.95] tracking-[-0.01em]"
+          className="font-serif text-[clamp(3.2rem,10vw,7rem)] leading-[0.95] tracking-[-0.015em]"
           style={{ color: p.accent, fontFamily: p.titleFont || undefined }}
         >
           {p.title}
         </h1>
-        <p className="mt-6 max-w-prose2 text-muted text-lg leading-relaxed font-light">
-          {p.tagline}
-        </p>
+        <div className="mt-7 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+          <p className="max-w-prose2 text-muted text-lg leading-relaxed font-light">
+            {p.tagline}
+          </p>
+          <div className="flex flex-wrap gap-x-3 shrink-0">
+            {p.tags.map((t, k) => (
+              <span
+                key={t}
+                className="font-mono text-[0.68rem] tracking-wide text-muted"
+              >
+                {t}
+                {k < p.tags.length - 1 && (
+                  <span className="ml-3 opacity-40">·</span>
+                )}
+              </span>
+            ))}
+          </div>
+        </div>
       </div>
     </Reveal>
   );
 }
 
-// Stacked section: accent-coloured heading sitting directly above its paragraph,
-// left-aligned in a readable column — matching the Figma case-study layout.
 function Section({ label, accent, children }) {
   return (
     <Reveal>
-      <div className="max-w-prose2 py-8">
+      <div className="grid md:grid-cols-[200px_1fr] gap-3 md:gap-12 py-10 border-t border-line">
         <h3
-          className="font-sans font-medium text-[1.35rem] tracking-tight mb-3"
+          className="font-sans font-medium text-[1.1rem] tracking-tight"
           style={{ color: accent }}
         >
           {label}
         </h3>
-        <p className="text-ink/85 leading-relaxed font-light text-[1.05rem]">
+        <p className="text-ink/85 leading-relaxed font-light text-[1.05rem] max-w-prose2">
           {children}
         </p>
       </div>
@@ -47,44 +58,36 @@ function Section({ label, accent, children }) {
   );
 }
 
-// Wide screenshot interleaved between text sections.
 function Shot({ src, label }) {
   return (
     <Reveal delay={0.05}>
       <SmartImage
         src={src}
         label={label}
-        className="w-full aspect-[16/10] object-cover rounded-xl my-6"
+        className="w-full aspect-[16/10] object-cover rounded-xl my-8"
       />
     </Reveal>
   );
 }
 
-// ---- layouts ---------------------------------------------------------------
-
 function CaseStudy({ p }) {
   return (
     <>
       <Shot src={p.heroShots[0]} label="hero shot 1" />
-
       <Section label="Overview" accent={p.accent}>
         {p.overview}
       </Section>
-
       <Shot src={p.heroShots[1]} label="hero shot 2" />
-
       <Section label="The Challenge" accent={p.accent}>
         {p.challenge}
       </Section>
-
       <Section label="The Solution" accent={p.accent}>
         {p.solution}
       </Section>
 
-      {/* images grid */}
       <Reveal>
         <div className="pt-14">
-          <h3 className="eyebrow mb-6">Images</h3>
+          <h3 className="eyebrow mb-7">Images</h3>
           <div className="grid sm:grid-cols-2 gap-4">
             {p.images.map((src, i) => (
               <SmartImage
@@ -98,10 +101,9 @@ function CaseStudy({ p }) {
         </div>
       </Reveal>
 
-      {/* key features */}
       <Reveal>
         <div className="pt-14">
-          <h3 className="eyebrow mb-6">Key Features</h3>
+          <h3 className="eyebrow mb-7">Key Features</h3>
           <div className="grid sm:grid-cols-3 gap-4">
             {p.keyFeatures.map((f, i) => (
               <SmartImage
@@ -118,23 +120,22 @@ function CaseStudy({ p }) {
   );
 }
 
-// Placeholder heights cycle so the collage has rhythm before real images go in.
 const COLLAGE_H = [280, 220, 340, 200, 300, 240];
 
 function GalleryItem({ item, index, accent }) {
-  const hasImg = item.image && item.image.trim() !== "";
+  const img = fixSrc(item.image);
   const hasLink = item.link && item.link.trim() !== "";
   const Wrapper = hasLink ? "a" : "div";
-  const wrapperProps = hasLink
+  const props = hasLink
     ? { href: item.link, target: "_blank", rel: "noreferrer" }
     : {};
 
   return (
-    <Wrapper {...wrapperProps} className="group block mb-4 break-inside-avoid">
+    <Wrapper {...props} className="group block mb-4 break-inside-avoid">
       <div className="relative overflow-hidden rounded-xl bg-surface-2">
-        {hasImg ? (
+        {img ? (
           <img
-            src={item.image}
+            src={img}
             alt={item.title || `photo ${index + 1}`}
             loading="lazy"
             className="w-full h-auto block transition-transform duration-700 group-hover:scale-[1.04]"
@@ -160,10 +161,9 @@ function GalleryItem({ item, index, accent }) {
           </div>
         )}
       </div>
-
       <div className="mt-3 flex items-baseline justify-between gap-3">
         <span
-          className={`font-mono text-[0.72rem] uppercase tracking-[0.14em] transition-colors ${
+          className={`font-mono text-[0.72rem] uppercase tracking-[0.12em] transition-colors ${
             item.title
               ? "text-muted group-hover:text-ink"
               : "text-muted/45 italic lowercase tracking-normal"
@@ -190,8 +190,6 @@ function Gallery({ p }) {
       <Section label="Context" accent={p.accent}>
         {p.context}
       </Section>
-
-      {/* collage / mosaic — items flow into columns at natural heights */}
       <Reveal>
         <div className="pt-8 columns-2 lg:columns-3 gap-4">
           {p.items.map((it, i) => (
@@ -202,8 +200,6 @@ function Gallery({ p }) {
     </>
   );
 }
-
-// ---- page ------------------------------------------------------------------
 
 export default function ProjectDetail() {
   const { slug } = useParams();
@@ -219,11 +215,14 @@ export default function ProjectDetail() {
         {p.notifyUrl && (
           <Reveal>
             <div
-              className="mt-16 p-8 rounded-2xl border border-line bg-surface/40 flex flex-col sm:flex-row sm:items-center justify-between gap-6"
+              className="mt-16 py-10 border-y flex flex-col sm:flex-row sm:items-center justify-between gap-7"
               style={{ borderColor: `${p.accent}33` }}
             >
               <div>
-                <p className="font-serif text-2xl" style={{ color: p.accent }}>
+                <p
+                  className="font-serif text-2xl md:text-3xl"
+                  style={{ color: p.accent }}
+                >
                   Interested in {p.title}?
                 </p>
                 <p className="text-muted text-sm mt-2 font-light max-w-sm">

@@ -2,73 +2,64 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ============================================================
-   SITE PALETTE — change these hex values to retune the whole site.
-   These are the deep-indigo (Palette 3) values from your Figma.
-   If a color is slightly off from your file, edit it here only.
-   ============================================================ */
+/* ============ SITE PALETTE — change hexes here to retune everything ======= */
 :root {
-  --bg: #0b0a1d; /* near-black indigo (page background) */
-  --surface: #16143a; /* cards / sections */
-  --surface-2: #100e2c; /* darker inset panels */
-  --ink: #ecebff; /* primary text */
-  --muted: #908dba; /* secondary text */
-  --line: rgba(255, 255, 255, 0.09); /* hairline borders */
-  --accent: #6c63ff; /* signature indigo accent */
+  --bg: #0b0a1d;
+  --surface: #16143a;
+  --surface-2: #100e2c;
+  --ink: #ecebff;
+  --muted: #908dba;
+  --line: rgba(255, 255, 255, 0.09);
+  --accent: #6c63ff;
 }
 
 * {
   box-sizing: border-box;
 }
-
 html {
   scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
-  background-color: var(--bg);
+  background: var(--bg);
   color: var(--ink);
   font-family: "Hanken Grotesk", system-ui, sans-serif;
   font-weight: 300;
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
   overflow-x: hidden;
 }
 
-/* Atmospheric depth: a soft indigo aurora that sits behind everything.
-   Fixed so it stays put while you scroll — "quiet, cinematic". */
+/* aurora + grain */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: -2;
+  pointer-events: none;
   background:
     radial-gradient(
-      60% 50% at 50% -5%,
-      rgba(108, 99, 255, 0.18),
+      55% 45% at 50% -5%,
+      rgba(108, 99, 255, 0.16),
       transparent 70%
     ),
     radial-gradient(
-      45% 40% at 90% 20%,
-      rgba(63, 113, 178, 0.12),
+      40% 38% at 92% 25%,
+      rgba(63, 113, 178, 0.1),
       transparent 70%
     ),
     radial-gradient(
-      50% 45% at 5% 80%,
-      rgba(108, 99, 255, 0.08),
+      45% 42% at 4% 85%,
+      rgba(108, 99, 255, 0.07),
       transparent 70%
     );
-  pointer-events: none;
 }
-
-/* Fine film grain overlay for cinematic texture. */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
   z-index: -1;
-  opacity: 0.045;
+  opacity: 0.04;
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
@@ -77,8 +68,6 @@ body::after {
   background: var(--accent);
   color: #fff;
 }
-
-/* Custom scrollbar to match the dark theme */
 ::-webkit-scrollbar {
   width: 10px;
 }
@@ -89,24 +78,20 @@ body::after {
   background: #2a2756;
   border-radius: 99px;
 }
-
 a {
   color: inherit;
   text-decoration: none;
 }
 
-/* Reusable utility: small label used for section eyebrows */
 .eyebrow {
   font-family: "DM Sans", sans-serif;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 500;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--muted);
 }
 
-/* Placeholder image styling — when an image URL is empty in content.js,
-   this dashed box shows up so you know exactly where to drop a link. */
 .img-placeholder {
   display: flex;
   align-items: center;
@@ -114,18 +99,35 @@ a {
   background: var(--surface-2);
   border: 1px dashed var(--line);
   color: var(--muted);
-  font-family: "JetBrains Mono", monospace;
+  font-family: "DM Sans", sans-serif;
   font-size: 0.7rem;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-align: center;
   padding: 1rem;
 }
 
-/* ============================================================
-   BUTTONS  —  edit everything here to restyle every button on
-   the site at once (hero "View work", the back links, the
-   contact "Send" button all use these classes).
-   ============================================================ */
+/* underline-only inputs (contact form) */
+.input-line {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  padding: 0.9rem 0;
+  color: var(--ink);
+  font-family: inherit;
+  font-weight: 300;
+  font-size: 1rem;
+  transition: border-color 0.35s ease;
+}
+.input-line::placeholder {
+  color: rgba(144, 141, 186, 0.55);
+}
+.input-line:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* ================= BUTTONS — one place to restyle them all ================ */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -144,37 +146,33 @@ a {
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
   transition:
     transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 0.3s ease,
-    background 0.3s ease,
-    box-shadow 0.3s ease;
+    border-color 0.3s,
+    background 0.3s,
+    box-shadow 0.3s;
 }
-
 .btn:hover {
   transform: translateY(-2px);
   background: rgba(108, 99, 255, 0.16);
   border-color: rgba(108, 99, 255, 0.5);
   box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.4);
 }
-
 .btn:active {
   transform: translateY(0);
 }
-
 .btn:disabled {
   opacity: 0.5;
   cursor: default;
   transform: none;
 }
-
-/* naked arrow — just the character, in accent, nudges on hover */
 .btn-arrow {
   color: var(--accent);
   font-size: 1rem;
   line-height: 1;
   display: inline-block;
+  position: relative;
+  top: -2px;
   transition: transform 0.3s ease;
 }
-
 .btn:hover .btn-arrow--right {
   transform: translateX(3px);
 }
@@ -183,4 +181,38 @@ a {
 }
 .btn:hover .btn-arrow--left {
   transform: translateX(-3px);
+}
+
+/* project index rows */
+.work-row {
+  position: relative;
+  display: block;
+  border-top: 1px solid var(--line);
+}
+.work-row:last-child {
+  border-bottom: 1px solid var(--line);
+}
+.work-thumb {
+  overflow: hidden;
+  border-radius: 0.9rem;
+  background: var(--surface-2);
+}
+.work-thumb img,
+.work-thumb .img-placeholder {
+  transition:
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.6s ease;
+  filter: saturate(0.7) brightness(0.85);
+}
+.work-row:hover .work-thumb img {
+  transform: scale(1.06);
+  filter: saturate(1) brightness(1);
+}
+.work-title {
+  transition:
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.4s ease;
+}
+.work-row:hover .work-title {
+  transform: translateX(10px);
 }
